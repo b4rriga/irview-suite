@@ -65,3 +65,15 @@ In addition to the image data, the output file stores a scalar variable named `f
 - `numpy`
 - `matplotlib`
 - `PyQt5`
+
+## Installation
+
+Build:
+```sh
+make
+```
+
+Install:
+```sh
+sudo make install
+```
