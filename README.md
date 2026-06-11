@@ -28,9 +28,9 @@ Opens a camera stream via OpenCV viewer. Video is presented as received from the
 
 Since IR cameras typically provide relatively low-resolution images, the display can be enlarged using the `FACTOR` variable. When `ROI` is set to `True`, only a selected portion of the frame is displayed. The default region of interest targets the thermal image produced by the Hikmicro Mini2 camera, the device for which this utility was originally developed.
 
-<img src="images/irwebcam.png" height="50%">
-
 #### irshot
+
+TODO: Capture tool
 
 ## Dependencies
 
