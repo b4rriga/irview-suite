@@ -30,7 +30,11 @@ Since IR cameras typically provide relatively low-resolution images, the display
 
 #### irshot
 
-Capture a sequence of thermal frames from the camera and export them to a MATLAB-compatible `.mat` file.
+```sh
+irshot [n_samples] [fps]
+```
+
+Captures a sequence of thermal frames from the camera and exports them to a MATLAB-compatible `.mat` file.
 
 The first command-line argument specifies the number of frames to acquire, while the second specifies the desired sampling rate in frames per second. Since the camera operates at a fixed maximum frame rate, lower sampling rates are achieved by discarding intermediate frames. Thus, best consistency for delta time between frames is achieved by choosing a sampling rate that is easily divisible by your `MAX_FPS`.
 
