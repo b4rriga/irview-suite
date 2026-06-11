@@ -12,6 +12,8 @@ This software suite began as a Python port of IR View 1.7.5, originally written 
 
 ### IR View
 
+![IR View](screenshot.png)
+
 TODO: Main application
 
 ### ircap
