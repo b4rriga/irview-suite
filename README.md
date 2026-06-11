@@ -1,6 +1,12 @@
 # IR View Suite
 
-**WORK IN PROGRESS**
+## Overview
+
+IR View is an infrared thermography viewer and processor for non-destructive testing, built with a strong focus on compatibility with MATLAB data sets. Its associated utilities include a video streaming server, a live preview program in the style of a webcam, and a headless capturing script which produces MATLAB-compatible `.mat` files.
+
+## Origin
+
+This software suite began as a Python port of IR View 1.7.5, originally written in MATLAB by _Mariacristina Pilla_, _Matthieu Klein_ and _Xavier Maldague_ (1999–2008). The port was carried out during my stay at the _Grupo de Ingeniería Fotónica, Universidad de Cantabria_ (March through June of 2026). Soon, the port expanded far beyond the scope of the original application, and standalone utilities were written to aid in development.
 
 ## Components
 
@@ -34,7 +40,7 @@ Since IR cameras typically provide relatively low-resolution images, the display
 irshot [n_samples] [fps]
 ```
 
-Captures a sequence of thermal frames from the camera and exports them to a MATLAB-compatible `.mat` file.
+Captures a sequence of thermal frames from the camera and exports them to a MATLAB-compatible `.mat` (version 5) file.
 
 The first command-line argument specifies the number of frames to acquire, while the second specifies the desired sampling rate in frames per second. Since the camera operates at a fixed maximum frame rate, lower sampling rates are achieved by discarding intermediate frames. Thus, best consistency for delta time between frames is achieved by choosing a sampling rate that is easily divisible by your `MAX_FPS`.
 
