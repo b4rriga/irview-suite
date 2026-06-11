@@ -64,9 +64,9 @@ static inline float _median3(float a, float b, float c)
     return b;
 }
 
-/* --- hmf_f32 -------------------------------------------------------------- */
+/* --- hmf ------------------------------------------------------------------ */
 /* NOTE: unchanged algorithm; tmp removed as only staging buffer (kept). */
-void hmf_f32(const float *src, float *dst, int H, int W)
+void hmf(const float *src, float *dst, int H, int W)
 {
     static const int CR[9][2] = {
         {-2,0},{-1,0},{0,-2},{0,-1},{0,0},{0,1},{0,2},{1,0},{2,0}
@@ -100,9 +100,9 @@ void hmf_f32(const float *src, float *dst, int H, int W)
     free(tmp);
 }
 
-/* --- gauss_f32 ------------------------------------------------------------ */
+/* --- gauss ---------------------------------------------------------------- */
 /* Minor optimization: fewer double casts in inner loops. */
-void gauss_f32(const float *src, float *dst, int H, int W, float variance)
+void gauss(const float *src, float *dst, int H, int W, float variance)
 {
     double i_max = 10.0 * sqrt((double)variance);
     int klen = (int)round(i_max) + 1;
@@ -214,9 +214,9 @@ void gauss_f32(const float *src, float *dst, int H, int W, float variance)
     free(tmp2);
 }
 
-/* --- corrct_f32 ----------------------------------------------------------- */
+/* --- corrct --------------------------------------------------------------- */
 /* Minor optimization: cache HW and reuse pointer base offsets. */
-void corrct_f32(const float *seq, float *out, int H, int W, int N)
+void corrct(const float *seq, float *out, int H, int W, int N)
 {
     int HW = H * W;
 
@@ -275,8 +275,8 @@ void corrct_f32(const float *seq, float *out, int H, int W, int N)
     free(ref);
 }
 
-/* --- pct_standardize_f32 -------------------------------------------------- */
-void pct_standardize_f32(float *mat, int rows, int cols)
+/* --- pct_standardize ------------------------------------------------------ */
+void pct_standardize(float *mat, int rows, int cols)
 {
     for (int c = 0; c < cols; c++) {
 
@@ -308,8 +308,8 @@ void pct_standardize_f32(float *mat, int rows, int cols)
     }
 }
 
-/* --- extrap_sib_f32 ------------------------------------------------------- */
-void extrap_sib_f32(const float *img_prime, double t_p, double t_now,
+/* --- extrap_sib ----------------------------------------------------------- */
+void extrap_sib(const float *img_prime, double t_p, double t_now,
                     float *out, int n)
 {
     float ratio = (t_now > 0.0) ? (float)sqrt(t_p / t_now) : 1.0f;
@@ -319,8 +319,8 @@ void extrap_sib_f32(const float *img_prime, double t_p, double t_now,
     }
 }
 
-/* --- minmax_f32 ------------------------------------------------------------ */
-void minmax_f32(const float *a, int n, float *out_min, float *out_max)
+/* --- minmax ---------------------------------------------------------------- */
+void minmax(const float *a, int n, float *out_min, float *out_max)
 {
     float lo = FLT_MAX;
     float hi = -FLT_MAX;
@@ -337,8 +337,8 @@ void minmax_f32(const float *a, int n, float *out_min, float *out_max)
     *out_max = hi;
 }
 
-/* --- ca_f32 --------------------------------------------------------------- */
-void ca_f32(const float *seq, const float *cold, int ref_px,
+/* --- ca ------------------------------------------------------------------- */
+void ca(const float *seq, const float *cold, int ref_px,
             float *out, int HW, int N)
 {
     for (int i = 0; i < N; i++) {
@@ -352,8 +352,8 @@ void ca_f32(const float *seq, const float *cold, int ref_px,
     }
 }
 
-/* --- dac_f32 -------------------------------------------------------------- */
-void dac_f32(const float *seq, const float *cold, int t_prime,
+/* --- dac ------------------------------------------------------------------ */
+void dac(const float *seq, const float *cold, int t_prime,
              float *out, int HW, int N)
 {
     int out_N = N - t_prime;
@@ -375,12 +375,12 @@ void dac_f32(const float *seq, const float *cold, int t_prime,
     }
 }
 
-/* --- rx_f32 --------------------------------------------------------------- */
+/* --- rx ------------------------------------------------------------------- */
 /*
  * NOTE: computational bottleneck O(HW * N^2).
  * No algorithmic change applied; only memory access ordering preserved.
  */
-void rx_f32(const float *seq_centred, const float *sphere,
+void rx(const float *seq_centred, const float *sphere,
             float *out, int HW, int N)
 {
     for (int p = 0; p < HW; p++) {
@@ -406,8 +406,8 @@ void rx_f32(const float *seq_centred, const float *sphere,
     }
 }
 
-/* --- skq_f32 -------------------------------------------------------------- */
-void skq_f32(const float *seq_centred,
+/* --- skq ------------------------------------------------------------------ */
+void skq(const float *seq_centred,
              float *kurt, float *skew, float *rxout, float *quinto,
              int HW, int N)
 {
@@ -445,8 +445,8 @@ void skq_f32(const float *seq_centred,
     }
 }
 
-/* --- haar_dwt_f32 --------------------------------------------------------- */
-void haar_dwt_f32(const float *seq, float *ca, float *cd, int HW, int N)
+/* --- haar_dwt ------------------------------------------------------------- */
+void haar_dwt(const float *seq, float *ca, float *cd, int HW, int N)
 {
     int half = N / 2;
     const float S = 0.7071067811865476f;
