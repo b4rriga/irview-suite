@@ -11,6 +11,8 @@
 
 ## Dependencies
 
-- `numpy`
+- `opencv-python`
 - `scipy`
-- `cv2`
+- `numpy`
+- `matplotlib`
+- `PyQt5`
