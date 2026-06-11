@@ -1,21 +1,19 @@
 /*
- * ircore.c
+ *  This file is part of IR View Suite.
  *
- * High-performance image and temporal processing kernels used by IR View.
+ *  IR View Suite - Thermal/IR imaging suite
+ *  Copyright (C) 2026 Hugo Barriga
  *
- * Layout:
- *   Images    : float32 row-major (H * W)
- *   Sequences : float32 row-major (H * W, N)
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License v3
+ *  as published by the Free Software Foundation.
  *
- * Build:
- *   gcc -O3 -march=native -ffast-math -fPIC -shared ircore.c -lm -o ircore.so
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY.
+ *  See the GNU Affero General Public License for more details.
  *
- * Changes in this revision:
- *   - Consistent spacing and formatting
- *   - Reduced redundant casts in hot loops
- *   - Minor micro-optimizations in temporal kernels (cached pointers, fewer recomputations)
- *   - Clarified comments, removed noise
- *   - Preserved API compatibility
+ *  You should have received a copy of the GNU AGPLv3 along with this program.
+ *  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <math.h>
