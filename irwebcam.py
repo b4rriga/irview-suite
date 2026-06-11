@@ -28,25 +28,25 @@ ROI    = False
 FRAME  = WIDTH * HEIGHT * 2
 
 p = subprocess.Popen(
-    ["v4l2-ctl", "-d", DEVICE, "--stream-mmap", "--stream-to=-", "--stream-count=0"],
-    stdout=subprocess.PIPE,
-    stderr=subprocess.DEVNULL
+	["v4l2-ctl", "-d", DEVICE, "--stream-mmap", "--stream-to=-", "--stream-count=0"],
+	stdout=subprocess.PIPE,
+	stderr=subprocess.DEVNULL
 )
 
 try:
-    while True:
-        frame = np.frombuffer(p.stdout.read(FRAME), dtype=np.uint16).reshape((HEIGHT, WIDTH))
-        view = frame[196:292, 0:128] if ROI else frame
-        norm = cv2.normalize(view, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
+	while True:
+		frame = np.frombuffer(p.stdout.read(FRAME), dtype=np.uint16).reshape((HEIGHT, WIDTH))
+		view = frame[196:292, 0:128] if ROI else frame
+		norm = cv2.normalize(view, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
 
-        color = cv2.applyColorMap(norm, cv2.COLORMAP_INFERNO)
+		color = cv2.applyColorMap(norm, cv2.COLORMAP_INFERNO)
 
-        size = (128 * FACTOR, 96 * FACTOR) if ROI else (WIDTH * FACTOR, HEIGHT * FACTOR)
-        color = cv2.resize(color, (256*FACTOR, 344*FACTOR), interpolation=cv2.INTER_LINEAR)
+		size = (128 * FACTOR, 96 * FACTOR) if ROI else (WIDTH * FACTOR, HEIGHT * FACTOR)
+		color = cv2.resize(color, (256*FACTOR, 344*FACTOR), interpolation=cv2.INTER_LINEAR)
 
-        cv2.imshow("IR Webcam", color)
-        if cv2.waitKey(1) == 27:
-            break
+		cv2.imshow("IR Webcam", color)
+		if cv2.waitKey(1) == 27:
+			break
 finally:
-    p.terminate()
-    cv2.destroyAllWindows()
+	p.terminate()
+	cv2.destroyAllWindows()
