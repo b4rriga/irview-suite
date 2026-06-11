@@ -8,3 +8,9 @@
 - irshot
 - ircap
 - irview
+
+## Dependencies
+
+- `numpy`
+- `scipy`
+- `cv2`
