@@ -18,7 +18,7 @@ TODO: Main application
 
 TCP server that streams raw camera frames to any connected client. It runs in the background and forwards frames acquired from the video device over a TCP socket.
 
-IR View includes a client mode capable of connecting to an `ircap` stream, allowing real-time visualization of remotely served thermal data.
+IR View includes a client mode capable of connecting to an ircap stream, allowing real-time visualization of remotely served thermal data.
 
 The server is multi-threaded, enabling concurrent connections from multiple clients. Each client receives an independent stream derived from the same camera source on the host machine, allowing simultaneous remote viewing without interfering with acquisition.
 
