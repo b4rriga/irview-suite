@@ -16,7 +16,31 @@ TODO: Main application
 
 ### ircap
 
-TODO: Server
+TCP server that streams raw camera frames to any connected client. It runs in the background and forwards frames acquired from the video device over a TCP socket.
+
+IR View includes a client mode capable of connecting to an `ircap` stream, allowing real-time visualization of remotely served thermal data.
+
+The server is multi-threaded, enabling concurrent connections from multiple clients. Each client receives an independent stream derived from the same camera source on the host machine, allowing simultaneous remote viewing without interfering with acquisition.
+
+Running ircap every time it is needed can get old quickly. It is recommended to create a simple service. A very basic systemd service `ircap.service` would be mocked up as follows:
+
+```ini
+[Unit]
+Description=IR Camera TCP Stream Server
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=ircap
+Restart=always
+RestartSec=1
+User=irview
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Substitute irview at `User=irview` for your actual user name so as to not run ircap as root. If that does not bother you, you may omit the line entirely.
 
 ### Other Utilities
 
