@@ -19,18 +19,20 @@
 import os
 import sys
 import subprocess
+import configparser
 import numpy as np
 
 from datetime import datetime
 from scipy.io import savemat
 
-DEVICE = "/dev/video2"
+cfg = configparser.ConfigParser()
+cfg.read("config.ini")
 
-WIDTH  = 256
-HEIGHT = 344
-FRAME  = WIDTH * HEIGHT * 2
-
-MAX_FPS = 25.0
+DEVICE  = cfg["camera"]["device"]
+WIDTH   = cfg.getint("camera", "width")
+HEIGHT  = cfg.getint("camera", "height")
+FRAME   = WIDTH * HEIGHT * 2
+MAX_FPS = cfg.getint("camera", "max_fps")
 
 def parse_args():
 	if len(sys.argv) < 2:
