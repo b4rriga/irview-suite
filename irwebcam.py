@@ -52,6 +52,8 @@ try:
 		cv2.imshow("IR Webcam", color)
 		if cv2.waitKey(1) == 27:
 			break
+except KeyboardInterrupt:
+    print()
 finally:
 	p.terminate()
 	cv2.destroyAllWindows()
