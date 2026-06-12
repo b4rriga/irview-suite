@@ -20,6 +20,7 @@ import socket
 import struct
 import time
 import subprocess
+import configparser
 import numpy as np
 import threading
 import os
@@ -27,11 +28,13 @@ import os
 _CAM_MAGIC   = b"IRFR"
 _CAM_HDR_FMT = "<4sIIId"
 
-DEVICE = "/dev/video2"
+cfg = configparser.ConfigParser()
+cfg.read("/etc/irview.ini")
 
-WIDTH  = 256
-HEIGHT = 344
-FRAME  = WIDTH * HEIGHT * 2
+DEVICE  = cfg["camera"]["device"]
+WIDTH   = cfg.getint("camera", "width")
+HEIGHT  = cfg.getint("camera", "height")
+FRAME   = WIDTH * HEIGHT * 2
 
 X0, X1 = 0, 256
 Y0, Y1 = 0, 192
