@@ -24,7 +24,7 @@ uninstall:
 	rm -f $(PREFIX)/ircap
 	rm -f $(PREFIX)/irshot
 	rm -f $(PREFIX)/irwebcam
-	rm -f /etc/irview.ini
+	@echo "Configuration file preserved: /etc/irview.ini"
 
 clean:
 	rm -f $(TARGET)
