@@ -16,16 +16,21 @@
 # You should have received a copy of the GNU AGPLv3 along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
 
+import configparser
 import subprocess
 import numpy as np
 import cv2
 
-DEVICE = "/dev/video2"
-WIDTH  = 256
-HEIGHT = 344
+cfg = configparser.ConfigParser()
+cfg.read("config.ini")
+
+DEVICE = cfg["camera"]["device"]
+WIDTH  = cfg.getint("camera", "width")
+HEIGHT = cfg.getint("camera", "height")
+FRAME  = WIDTH * HEIGHT * 2
+
 FACTOR = 2
 ROI    = False
-FRAME  = WIDTH * HEIGHT * 2
 
 p = subprocess.Popen(
 	["v4l2-ctl", "-d", DEVICE, "--stream-mmap", "--stream-to=-", "--stream-count=0"],
