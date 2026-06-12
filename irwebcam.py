@@ -40,7 +40,11 @@ p = subprocess.Popen(
 
 try:
     while True:
-        frame = np.frombuffer(p.stdout.read(FRAME), dtype=np.uint16).reshape((HEIGHT, WIDTH))
+        buf = p.stdout.read(FRAME)
+        if len(buf) != FRAME:
+            raise RuntimeError(f"failed to read frame from {DEVICE}")
+
+        frame = np.frombuffer(buf, dtype=np.uint16).reshape((HEIGHT, WIDTH))
         view = frame[196:292, 0:128] if ROI else frame
         norm = cv2.normalize(view, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
 
