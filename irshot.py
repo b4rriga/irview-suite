@@ -26,7 +26,7 @@ from datetime import datetime
 from scipy.io import savemat
 
 cfg = configparser.ConfigParser()
-cfg.read("config.ini")
+cfg.read("/etc/irview.ini")
 
 DEVICE  = cfg["camera"]["device"]
 WIDTH   = cfg.getint("camera", "width")
