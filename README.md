@@ -86,12 +86,12 @@ In addition to the image data, the output file stores a scalar variable named `f
 
 ## Installation
 
-Build:
+#### Build
 ```sh
 make
 ```
 
-Install:
+#### Install
 ```sh
 sudo make install
 ```
@@ -100,7 +100,7 @@ sudo make install
 
 IR View Suite relies on a global configuration file to define camera parameters, acquisition settings and calibration data shared across all utilities. This avoids per-script hardcoding and ensures consistent behavior across the suite. This repository has an example configuration file `config.ini` which is installed at `/etc/irview.ini` by default.
 
-#### camera
+#### Camera
 
 | Key | Type | Description |
 |-----|------|-------------|
@@ -109,10 +109,10 @@ IR View Suite relies on a global configuration file to define camera parameters,
 | height | int | Frame height in pixels |
 | max_fps | int | Maximum camera frame rate |
 
-#### calibration
+#### Calibration
 
 Keys `c0` through `c4` define a 4th-degree calibration polynomial relating raw sensor values to degrees Celsius.
 
-#### network
+#### Network
 
 Key `port` defines the TCP port used by the streaming server.
