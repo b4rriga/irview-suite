@@ -46,14 +46,6 @@ Substitute irview at `User=irview` for your actual user name so as to not run ir
 
 ### Other Utilities
 
-The following global constants are defined in these utilities and control parameters such as resolution, frames per second and video device selection. Since camera characteristics vary between models, your mileage may vary:
-
-- `WIDTH`: width of raw frame, in pixels
-- `HEIGHT`: height of raw frame, in pixels
-- `FRAME`: total frame size in bytes, derived from `WIDTH`, `HEIGHT`, and the number of bytes per pixel
-- `MAX_FPS`: theoretical maximum frame rate of the camera
-- `DEVICE`: path to the video device (usually `/dev/video*`)
-
 #### irwebcam
 
 Opens a camera stream via OpenCV viewer. Video is presented as received from the raw byte stream of the video device, with a color palette applied.
@@ -103,3 +95,24 @@ Install:
 ```sh
 sudo make install
 ```
+
+## Configuration
+
+IR View Suite relies on a global configuration file to define camera parameters, acquisition settings and calibration data shared across all utilities. This avoids per-script hardcoding and ensures consistent behavior across the suite. This repository has an example configuration file `config.ini` which is installed at `/etc/irview.ini` by default.
+
+#### camera
+
+| Key | Type | Description |
+|-----|------|-------------|
+| device | string | Path to video device |
+| width | int | Frame width in pixels |
+| height | int | Frame height in pixels |
+| max_fps | int | Maximum camera frame rate |
+
+#### calibration
+
+Keys `c0` through `c4` define a 4th-degree calibration polynomial relating raw sensor values to degrees Celsius.
+
+#### network
+
+Key `port` defines the TCP port used by the streaming server.
