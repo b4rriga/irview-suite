@@ -14,7 +14,22 @@ This software suite began as a Python port of IR View 1.7.5, originally written 
 
 ![IR View](screenshot.png)
 
-TODO: Main application
+IR View is the main application of the suite. It provides real-time visualization and processing of infrared thermal data acquired either directly from a local video device or remotely through an ircap TCP stream.
+
+IR View supports two acquisition modes:
+
+Local mode: direct access to `/dev/video*` devices using `v4l2-ctl` stream capture.
+Network mode: connection to a remote (or localhost) ircap server, receiving framed thermal data over TCP with a lightweight binary protocol.
+
+Each incoming frame is decomposed into predefined regions corresponding to sensor layout (thermal image and metadata channels). These regions are exposed internally as structured arrays for downstream processing.
+
+A processing pipeline operates on the incoming data stream, applying filtering and normalization stages before display. Common operations include temporal smoothing, spatial filtering, and algorithmic processing.
+
+Internally, IR View is designed as a modular system where acquisition, processing and rendering are decoupled. This allows the same processing backend to operate on both live streams and recorded datasets without modification.
+
+The application accepts tweaking through the global configuration file, ensuring consistent parameters across acquisition, streaming and visualization components.
+
+IR View acts as the central execution layer of the suite: all other utilities (ircap, irshot, irwebcam) either feed data into it or replicate subsets of its pipeline for debugging and acquisition tasks.
 
 ### ircap
 
