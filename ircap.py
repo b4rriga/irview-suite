@@ -36,6 +36,8 @@ WIDTH   = cfg.getint("camera", "width")
 HEIGHT  = cfg.getint("camera", "height")
 FRAME   = WIDTH * HEIGHT * 2
 
+PORT    = cfg.getint("network", "port")
+
 X0, X1 = 0, 256
 Y0, Y1 = 0, 192
 W = X1 - X0
@@ -107,15 +109,14 @@ class Camera:
             return None if self.frame is None else self.frame.copy()
 
 class Server:
-    def __init__(self, port=54321):
-        self.port = port
+    def __init__(self):
         self.cam = Camera()
         self.idx = 0
 
     def start(self):
         srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        srv.bind(("0.0.0.0", self.port))
+        srv.bind(("0.0.0.0", PORT))
         srv.listen(10)
 
         print("Waiting for clients...")
