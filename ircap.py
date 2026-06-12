@@ -121,15 +121,20 @@ class Server:
 
         print("Waiting for clients...")
 
-        while True:
-            conn, addr = srv.accept()
-            print("[CONNECTION]", addr)
+        try:
+            while True:
+                conn, addr = srv.accept()
+                print("[CONNECTION]", addr)
 
-            threading.Thread(
-                target=self._client,
-                args=(conn, addr),
-                daemon=True
-            ).start()
+                threading.Thread(
+                    target=self._client,
+                    args=(conn, addr),
+                    daemon=True
+                ).start()
+        except KeyboardInterrupt:
+            print("\nShutting down server...")
+        finally:
+            srv.close()
 
     def _client(self, conn, addr):
         try:
