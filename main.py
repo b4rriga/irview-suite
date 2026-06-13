@@ -1122,7 +1122,7 @@ class DisplayPanel(QWidget):
     def __init__(self):
         super().__init__()
         self.setStyleSheet(_STYLE)
-        g  = QGroupBox("Display"); gl = QGridLayout(g); gl.setSpacing(7)
+        g  = QGroupBox("Display"); gl = QGridLayout(g); gl.setSpacing(8)
         self.chk_inv_x = QCheckBox("Invert X")
         self.chk_inv_y = QCheckBox("Invert Y")
         self.chk_axis  = QCheckBox("Axis"); self.chk_axis.setChecked(True)
@@ -1140,7 +1140,7 @@ class FramePanel(QWidget):
     def __init__(self, n_frames=0):
         super().__init__()
         self.setStyleSheet(_STYLE)
-        g = QGroupBox("Frame"); gl = QGridLayout(g); gl.setSpacing(7)
+        g = QGroupBox("Frame"); gl = QGridLayout(g); gl.setSpacing(8)
         self.lbl_frame = QLabel(f"1 / {max(n_frames, 1)}")
         self.lbl_frame.setAlignment(Qt.AlignCenter)
         gl.addWidget(self.lbl_frame, 0, 0, 1, 4)
@@ -1184,7 +1184,7 @@ class ControlPanel(QWidget):
         # Spatial Filter
         g3 = QGroupBox("Spatial Filter")
         gl3 = QGridLayout(g3)
-        gl3.setSpacing(7)
+        gl3.setSpacing(8)
 
         self.btn_noflt  = QPushButton("None")
         self.btn_gauss  = QPushButton("Gaussian")
@@ -1219,22 +1219,26 @@ class ControlPanel(QWidget):
         # Color / Clamping
         g4 = QGroupBox("Color / Clamping")
         gl4 = QGridLayout(g4)
-        gl4.setSpacing(7)
+        gl4.setSpacing(8)
+
+        gl4.setColumnStretch(0, 1)
+        gl4.setColumnStretch(1, 1)
+
+        self.chk_lock = QCheckBox("Lock all")
+        gl4.addWidget(self.chk_lock, 0, 0, 1, 2)
 
         self.cb_cmap = QComboBox()
         self.cb_cmap.addItems(_CMAP_LABELS)
         self.cb_cmap.setCurrentIndex(_CMAP_KEYS.index("jet"))
-
-        gl4.addWidget(self.cb_cmap, 0, 0, 1, 2)
+        gl4.addWidget(self.cb_cmap, 1, 0, 1, 2)
 
         self.lbl_ncolors = QLabel("Colors: 256 / 256")
-        gl4.addWidget(self.lbl_ncolors, 1, 0, 1, 2)
+        gl4.addWidget(self.lbl_ncolors, 2, 0, 1, 2)
 
         self.sl_ncolors = QSlider(Qt.Horizontal)
         self.sl_ncolors.setRange(2, 256)
         self.sl_ncolors.setValue(256)
-
-        gl4.addWidget(self.sl_ncolors, 2, 0, 1, 2)
+        gl4.addWidget(self.sl_ncolors, 3, 0, 1, 2)
 
         self.btn_clamp_img = QPushButton("Fit Frame")
         self.btn_clamp_seq = QPushButton("Fit Seq.")
@@ -1259,10 +1263,10 @@ class ControlPanel(QWidget):
             self.btn_clamp_man
         ): self._clamp_grp.addButton(b)
 
-        gl4.addWidget(self.btn_clamp_img, 3, 0)
-        gl4.addWidget(self.btn_clamp_seq, 3, 1)
-        gl4.addWidget(self.btn_clamp_roi, 4, 0)
-        gl4.addWidget(self.btn_clamp_man, 4, 1)
+        gl4.addWidget(self.btn_clamp_img, 4, 0)
+        gl4.addWidget(self.btn_clamp_seq, 4, 1)
+        gl4.addWidget(self.btn_clamp_roi, 5, 0)
+        gl4.addWidget(self.btn_clamp_man, 5, 1)
 
         self.edt_hi = QLineEdit("0.0")
         self.edt_hi.setValidator(QDoubleValidator())
@@ -1272,28 +1276,24 @@ class ControlPanel(QWidget):
         self.edt_lo.setValidator(QDoubleValidator())
         self.sl_lo = QSlider(Qt.Horizontal)
 
-        self.chk_lock = QCheckBox("Lock all")
-
         self._manual_widgets = [self.edt_hi, self.sl_hi, self.edt_lo, self.sl_lo]
         for w in self._manual_widgets:
             w.setEnabled(False)
 
-        gl4.addWidget(QLabel("High"), 5, 0)
-        gl4.addWidget(self.edt_hi, 5, 1)
-        gl4.addWidget(self.sl_hi, 6, 0, 1, 2)
+        gl4.addWidget(QLabel("High"), 6, 0)
+        gl4.addWidget(self.edt_hi,    6, 1)
+        gl4.addWidget(self.sl_hi,     7, 0, 1, 2)
 
-        gl4.addWidget(QLabel("Low"), 7, 0)
-        gl4.addWidget(self.edt_lo, 7, 1)
-        gl4.addWidget(self.sl_lo, 8, 0, 1, 2)
-
-        gl4.addWidget(self.chk_lock, 9, 0, 1, 2)
+        gl4.addWidget(QLabel("Low"), 8, 0)
+        gl4.addWidget(self.edt_lo,   8, 1)
+        gl4.addWidget(self.sl_lo,    9, 0, 1, 2)
 
         root.addWidget(g4)
 
         # Processing
         g5 = QGroupBox("Processing")
         gl5 = QGridLayout(g5)
-        gl5.setSpacing(7)
+        gl5.setSpacing(8)
 
         def _p(t):
             b = QPushButton(t)
