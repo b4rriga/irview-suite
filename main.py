@@ -94,7 +94,7 @@ CLAMP_IMG, CLAMP_SEQ, CLAMP_ROI, CLAMP_MAN = 0, 1, 2, 3
 MODE_IDLE, MODE_FILE, MODE_STREAM = 0, 1, 2
 
 # ------------------------------------------------------------------------------
-# Colourmaps
+# Colormaps
 # ------------------------------------------------------------------------------
 
 def _make_iron():
@@ -410,7 +410,7 @@ def haar_dwt(seq):
     return ca.reshape(H, W, N // 2), cd.reshape(H, W, N // 2)
 
 # ------------------------------------------------------------------------------
-# Colourmap lookup table (numpy, used by OpenCV canvas)
+# Colormap lookup table (numpy, used by OpenCV canvas)
 # ------------------------------------------------------------------------------
 
 def _build_lut(cmap_name, n_colors):
@@ -588,7 +588,7 @@ QFrame[frameShape="4"], QFrame[frameShape="5"] { color: #b0b0b0; }
 class IRDisplay(QWidget):
     """
     High-performance IR image display using QPixmap rendering.
-    Supports: colour mapping, axis ticks with real coordinates,
+    Supports: color mapping, axis ticks with real coordinates,
     grid overlay, x/y inversion, ROI rubber-band overlay.
     Mouse signals mirror the old IRCanvas API.
     """
@@ -624,7 +624,7 @@ class IRDisplay(QWidget):
         self._MARG_R = 14
         self._MARG_B = 24
 
-        # Colourbar
+        # Colorbar
         self._CBAR_W = 26
         self._CBAR_LABEL_W = 58
 
@@ -807,7 +807,7 @@ class IRDisplay(QWidget):
         cb_h = ih
         cb_idx = np.arange(255, -1, -1, dtype=np.uint8)          # (256, ) 1D indices
         cb_rgb = np.ascontiguousarray(self._lut[cb_idx][:, ::-1])  # (256, 3) RGB
-        # Each row is one colour; repeat to width=1 px, then scale
+        # Each row is one color; repeat to width=1 px, then scale
         cb_row = cb_rgb.reshape(256, 1, 3)
         cb_c   = np.ascontiguousarray(np.repeat(cb_row, 1, axis=1))
         qi_cb  = QImage(cb_c.tobytes(), 1, 256, 3, QImage.Format_RGB888)
@@ -1167,58 +1167,127 @@ class FramePanel(QWidget):
     def current_frame(self): return self.sl_frame.value()-1
 
 # ------------------------------------------------------------------------------
-# Control panel (right pane — no Frame section)
+# Control panel (right pane)
 # ------------------------------------------------------------------------------
 
 class ControlPanel(QWidget):
     def __init__(self):
         super().__init__()
-        self.setStyleSheet(_STYLE); self.setMinimumWidth(256)
-        root = QVBoxLayout(self); root.setContentsMargins(8, 8, 8, 8); root.setSpacing(10)
+
+        self.setStyleSheet(_STYLE)
+        self.setMinimumWidth(256)
+
+        root = QVBoxLayout(self)
+        root.setContentsMargins(8, 8, 8, 8)
+        root.setSpacing(10)
 
         # Spatial Filter
-        g3 = QGroupBox("Spatial Filter"); gl3 = QGridLayout(g3); gl3.setSpacing(7)
-        self.btn_noflt  = QPushButton("None");     self.btn_noflt.setCheckable(True);  self.btn_noflt.setChecked(True)
-        self.btn_gauss  = QPushButton("Gaussian"); self.btn_gauss.setCheckable(True)
-        self.btn_median = QPushButton("Median");   self.btn_median.setCheckable(True)
-        self._flt_grp = QButtonGroup(); self._flt_grp.setExclusive(True)
-        for b in [self.btn_noflt, self.btn_gauss, self.btn_median]: self._flt_grp.addButton(b)
-        gl3.addWidget(self.btn_noflt, 0, 0); gl3.addWidget(self.btn_gauss, 0, 1); gl3.addWidget(self.btn_median, 0, 2)
-        self.lbl_var = QLabel("Variance: 0.85"); self.lbl_var.setEnabled(False)
-        self.sl_var  = QSlider(Qt.Horizontal); self.sl_var.setRange(5, 500); self.sl_var.setValue(85); self.sl_var.setEnabled(False)
-        gl3.addWidget(self.lbl_var, 1, 0, 1, 3); gl3.addWidget(self.sl_var, 2, 0, 1, 3)
+        g3 = QGroupBox("Spatial Filter")
+        gl3 = QGridLayout(g3)
+        gl3.setSpacing(7)
+
+        self.btn_noflt  = QPushButton("None")
+        self.btn_gauss  = QPushButton("Gaussian")
+        self.btn_median = QPushButton("Median")
+
+        for b in (self.btn_noflt, self.btn_gauss, self.btn_median):
+            b.setCheckable(True)
+
+        self.btn_noflt.setChecked(True)
+
+        self._flt_grp = QButtonGroup()
+        self._flt_grp.setExclusive(True)
+        for b in [self.btn_noflt, self.btn_gauss, self.btn_median]:
+            self._flt_grp.addButton(b)
+
+        gl3.addWidget(self.btn_noflt,  0, 0)
+        gl3.addWidget(self.btn_gauss,  0, 1)
+        gl3.addWidget(self.btn_median, 0, 2)
+
+        self.lbl_var = QLabel("Variance: 0.85")
+        self.lbl_var.setEnabled(False)
+
+        self.sl_var = QSlider(Qt.Horizontal)
+        self.sl_var.setRange(5, 500)
+        self.sl_var.setValue(85)
+        self.sl_var.setEnabled(False)
+
+        gl3.addWidget(self.lbl_var, 1, 0, 1, 3)
+        gl3.addWidget(self.sl_var,  2, 0, 1, 3)
         root.addWidget(g3)
 
-        # Colour / Clamping
-        g4 = QGroupBox("Colour / Clamping"); gl4 = QGridLayout(g4); gl4.setSpacing(7)
-        self.cb_cmap = QComboBox(); self.cb_cmap.addItems(_CMAP_LABELS)
+        # Color / Clamping
+        g4 = QGroupBox("Color / Clamping")
+        gl4 = QGridLayout(g4)
+        gl4.setSpacing(7)
+
+        self.cb_cmap = QComboBox()
+        self.cb_cmap.addItems(_CMAP_LABELS)
         self.cb_cmap.setCurrentIndex(_CMAP_KEYS.index("jet"))
+
         gl4.addWidget(self.cb_cmap, 0, 0, 1, 2)
+
         self.lbl_ncolors = QLabel("Colors: 256 / 256")
         gl4.addWidget(self.lbl_ncolors, 1, 0, 1, 2)
-        self.sl_ncolors = QSlider(Qt.Horizontal); self.sl_ncolors.setRange(2, 256); self.sl_ncolors.setValue(256)
+
+        self.sl_ncolors = QSlider(Qt.Horizontal)
+        self.sl_ncolors.setRange(2, 256)
+        self.sl_ncolors.setValue(256)
+
         gl4.addWidget(self.sl_ncolors, 2, 0, 1, 2)
-        # 2x2 clamp buttons
-        self.btn_clamp_img = QPushButton("Fit Frame"); self.btn_clamp_img.setCheckable(True); self.btn_clamp_img.setChecked(True)
-        self.btn_clamp_seq = QPushButton("Fit Seq");   self.btn_clamp_seq.setCheckable(True)
-        self.btn_clamp_roi = QPushButton("Fit ROI");   self.btn_clamp_roi.setCheckable(True)
-        self.btn_clamp_man = QPushButton("Manual");    self.btn_clamp_man.setCheckable(True)
-        self._clamp_grp = QButtonGroup(); self._clamp_grp.setExclusive(True)
-        for b in [self.btn_clamp_img, self.btn_clamp_seq, self.btn_clamp_roi, self.btn_clamp_man]:
-            self._clamp_grp.addButton(b)
-        gl4.addWidget(self.btn_clamp_img, 3, 0); gl4.addWidget(self.btn_clamp_seq, 3, 1)
-        gl4.addWidget(self.btn_clamp_roi, 4, 0); gl4.addWidget(self.btn_clamp_man, 4, 1)
-        gl4.addWidget(QLabel("High"), 5, 0)
-        self.edt_hi = QLineEdit("0.0"); self.edt_hi.setValidator(QDoubleValidator())
-        gl4.addWidget(self.edt_hi, 5, 1)
-        self.sl_hi = QSlider(Qt.Horizontal); gl4.addWidget(self.sl_hi, 6, 0, 1, 2)
-        gl4.addWidget(QLabel("Low"), 7, 0)
-        self.edt_lo = QLineEdit("0.0"); self.edt_lo.setValidator(QDoubleValidator())
-        gl4.addWidget(self.edt_lo, 7, 1)
-        self.sl_lo = QSlider(Qt.Horizontal); gl4.addWidget(self.sl_lo, 8, 0, 1, 2)
-        self.chk_lock = QCheckBox("Lock all"); gl4.addWidget(self.chk_lock, 9, 0, 1, 2)
+
+        self.btn_clamp_img = QPushButton("Fit Frame")
+        self.btn_clamp_seq = QPushButton("Fit Seq.")
+        self.btn_clamp_roi = QPushButton("Fit ROI")
+        self.btn_clamp_man = QPushButton("Manual")
+
+        for b in (
+            self.btn_clamp_img,
+            self.btn_clamp_seq,
+            self.btn_clamp_roi,
+            self.btn_clamp_man,
+        ): b.setCheckable(True)
+
+        self.btn_clamp_man.setCheckable(True)
+
+        self._clamp_grp = QButtonGroup()
+        self._clamp_grp.setExclusive(True)
+        for b in (
+            self.btn_clamp_img,
+            self.btn_clamp_seq,
+            self.btn_clamp_roi,
+            self.btn_clamp_man
+        ): self._clamp_grp.addButton(b)
+
+        gl4.addWidget(self.btn_clamp_img, 3, 0)
+        gl4.addWidget(self.btn_clamp_seq, 3, 1)
+        gl4.addWidget(self.btn_clamp_roi, 4, 0)
+        gl4.addWidget(self.btn_clamp_man, 4, 1)
+
+        self.edt_hi = QLineEdit("0.0")
+        self.edt_hi.setValidator(QDoubleValidator())
+        self.sl_hi = QSlider(Qt.Horizontal)
+
+        self.edt_lo = QLineEdit("0.0")
+        self.edt_lo.setValidator(QDoubleValidator())
+        self.sl_lo = QSlider(Qt.Horizontal)
+
+        self.chk_lock = QCheckBox("Lock all")
+
         self._manual_widgets = [self.edt_hi, self.sl_hi, self.edt_lo, self.sl_lo]
-        for w in self._manual_widgets: w.setEnabled(False)
+        for w in self._manual_widgets:
+            w.setEnabled(False)
+
+        gl4.addWidget(QLabel("High"), 5, 0)
+        gl4.addWidget(self.edt_hi, 5, 1)
+        gl4.addWidget(self.sl_hi, 6, 0, 1, 2)
+
+        gl4.addWidget(QLabel("Low"), 7, 0)
+        gl4.addWidget(self.edt_lo, 7, 1)
+        gl4.addWidget(self.sl_lo, 8, 0, 1, 2)
+
+        gl4.addWidget(self.chk_lock, 9, 0, 1, 2)
+
         root.addWidget(g4)
 
         # Processing
@@ -2049,7 +2118,7 @@ class IrView:
             self.ctrl.set_clamp(lo, hi); self.canvas.set_clim(lo, hi)
             self._push_roi_preview(lo, hi)
 
-    # -- colour ---------------------------------------------------------------
+    # -- color ---------------------------------------------------------------
 
     def _on_cmap(self):
         idx = self.ctrl.cb_cmap.currentIndex(); cmax = _CMAP_MAXCOLS[idx]
