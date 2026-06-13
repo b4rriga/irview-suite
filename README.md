@@ -27,8 +27,9 @@ Each incoming frame is decomposed into predefined regions corresponding to senso
 - **Fourier Phase**: Computes the phase spectrum of each pixel's temporal response. Often less sensitive to non-uniform heating and surface emissivity variations than amplitude-based methods.
 - **Absolute Contrast (AC)**: Enhances thermal anomalies by comparing each frame against a reference condition or baseline image.
 - **Differential Absolute Contrast (DAC)**: Compensates for the theoretical thermal decay of a homogeneous material, improving defect visibility at later times.
-- **Extrapolated Contrast _(EXPERIMENTAL)_**: Estimates the expected thermal decay of a sound region and highlights deviations from that behaviour. Experimental implementation.
+- **Extrapolated Contrast _[EXPERIMENTAL]_**: Estimates the expected thermal decay of a sound region and highlights deviations from that behaviour. Experimental implementation.
 - **Correlation**: Measures the similarity between each pixel's temporal evolution and a reference thermal response. Defective regions often exhibit reduced correlation.
+- **Haar DWT (Wavelet) _[EXPERIMENTAL]_**: Performs a Haar wavelet decomposition of each pixel's temporal response, separating approximation and detail components that can reveal thermal transients at different temporal scales.
 - **Principal Component Thermography (PCT)**: Applies principal component analysis to the image sequence, concentrating relevant thermal information into a small number of orthogonal components.
 - **Thermographic Signal Reconstruction (TSR)**: Fits a polynomial model to the logarithmic thermal decay curve, reducing noise and enabling derivative-based defect enhancement.
 - **RX Detector**: Statistical anomaly detector based on the Mahalanobis distance. Highlights pixels whose temporal behaviour differs significantly from the global background.
