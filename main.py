@@ -329,9 +329,9 @@ def rx_detector(seq):
         out     = out_np.astype(np.float32)
     return out.reshape(H, W)
 
-def skq_stats(seq):
+def skf_stats(seq):
     """
-    SKQ: per-pixel kurtosis, skewness, RX (un-sphered), 5th moment.
+    SKF: per-pixel kurtosis, skewness, RX (un-sphered), 5th moment.
     Returns dict with keys 'kurtosis', 'skewness', 'rx', 'fifth', each (H, W) float32.
     """
     H, W, N = seq.shape
@@ -343,9 +343,9 @@ def skq_stats(seq):
     rxout = np.empty(H * W, dtype=np.float32)
     fifth = np.empty(H * W, dtype=np.float32)
     if _lib:
-        _lib.skq.argtypes = [_fp, _fp, _fp, _fp, _fp, ctypes.c_int, ctypes.c_int]
-        _lib.skq.restype = None
-        _lib.skq(_ptr(f32), _ptr(kurt), _ptr(skew), _ptr(rxout), _ptr(fifth),
+        _lib.skf.argtypes = [_fp, _fp, _fp, _fp, _fp, ctypes.c_int, ctypes.c_int]
+        _lib.skf.restype = None
+        _lib.skf(_ptr(f32), _ptr(kurt), _ptr(skew), _ptr(rxout), _ptr(fifth),
                      ctypes.c_int(H * W), ctypes.c_int(N))
     else:
         sig2 = m.var(axis=1);  sig2[sig2 < 1e-30] = 1e-30
@@ -357,9 +357,9 @@ def skq_stats(seq):
     return {"kurtosis": kurt.reshape(H, W), "skewness": skew.reshape(H, W),
             "rx": rxout.reshape(H, W), "fifth": fifth.reshape(H, W)}
 
-def pca_mmethod(seq):
+def pct_mmethod(seq):
     """
-    PCA M-Method: SVD, keep components until cumulative variance > 99.9%.
+    PCT M-Method: SVD, keep components until cumulative variance > 99.9%.
     Returns (U, s_norm, n_components) where U is (H, W, n_components).
     """
     H, W, N = seq.shape
@@ -1226,32 +1226,31 @@ class ControlPanel(QWidget):
         def _p(t):
             b = QPushButton(t); b.setCheckable(True); return b
 
-        self.btn_temp    = _p("Temperature"); self.btn_temp.setChecked(True)
+        self.btn_temp    = _p("Temperature ºC"); self.btn_temp.setChecked(True)
         self.btn_ftamp   = _p("FT Amplitude")
         self.btn_ftphase = _p("FT Phase")
-        self.btn_extrap  = _p("Extrap. CT")
-        self.btn_corr    = _p("Correlation")
-        self.btn_setupct = _p("Setup CT")
-        # New algorithms
         self.btn_ca      = _p("Abs. Contrast")
         self.btn_dac     = _p("Diff. AC")
-        self.btn_rx      = _p("RX Detector")
-        self.btn_skq     = _p("SKQ")
-        self.btn_pca_m   = _p("PCA M-Method")
+        self.btn_extrap  = _p("Extrap. CT")
+        self.btn_setupct = _p("Setup CT")
+        self.btn_pct_m   = _p("PCT")
         self.btn_tsr     = _p("TSR")
+        self.btn_corr    = _p("Correlation")
+        self.btn_rx      = _p("RX Detector")
+        self.btn_skf     = _p("SKF")
         self.btn_wavelet = _p("Wavelet")
 
         self._proc_grp = QButtonGroup(); self._proc_grp.setExclusive(True)
         for b in [self.btn_temp, self.btn_ftamp, self.btn_ftphase,
                   self.btn_extrap, self.btn_corr,
-                  self.btn_ca, self.btn_dac, self.btn_rx, self.btn_skq,
-                  self.btn_pca_m, self.btn_tsr, self.btn_wavelet]:
+                  self.btn_ca, self.btn_dac, self.btn_rx, self.btn_skf,
+                  self.btn_pct_m, self.btn_tsr, self.btn_wavelet]:
             self._proc_grp.addButton(b)
 
-        # SKQ sub-mode selector (shown only when SKQ active)
-        self.cb_skq = QComboBox()
-        self.cb_skq.addItems(["Kurtosis", "Skewness", "5th Moment"])
-        self.cb_skq.setEnabled(False)
+        # SKF sub-mode selector (shown only when SKF active)
+        self.cb_skf = QComboBox()
+        self.cb_skf.addItems(["Kurtosis", "Skewness", "5th Moment"])
+        self.cb_skf.setEnabled(False)
 
         r = 0
         gl5.addWidget(self.btn_temp,    r, 0, 1, 2); r += 1
@@ -1259,9 +1258,9 @@ class ControlPanel(QWidget):
         gl5.addWidget(self.btn_extrap,  r, 0, 1, 2); r += 1
         gl5.addWidget(self.btn_corr,    r, 0); gl5.addWidget(self.btn_setupct,  r, 1); r += 1
         gl5.addWidget(self.btn_ca,      r, 0); gl5.addWidget(self.btn_dac,     r, 1); r += 1
-        gl5.addWidget(self.btn_rx,      r, 0); gl5.addWidget(self.btn_skq,     r, 1); r += 1
-        gl5.addWidget(self.cb_skq,      r, 0, 1, 2); r += 1
-        gl5.addWidget(self.btn_pca_m,   r, 0); gl5.addWidget(self.btn_tsr,     r, 1); r += 1
+        gl5.addWidget(self.btn_rx,      r, 0); gl5.addWidget(self.btn_skf,     r, 1); r += 1
+        gl5.addWidget(self.cb_skf,      r, 0, 1, 2); r += 1
+        gl5.addWidget(self.btn_pct_m,   r, 0); gl5.addWidget(self.btn_tsr,     r, 1); r += 1
         gl5.addWidget(self.btn_wavelet, r, 0, 1, 2); r += 1
 
         sep = QFrame(); sep.setFrameShape(QFrame.HLine); gl5.addWidget(sep, r, 0, 1, 2); r += 1
@@ -1412,10 +1411,10 @@ class IrView:
         self._ca_cache   : Optional[np.ndarray] = None
         self._dac_cache  : Optional[np.ndarray] = None
         self._rx_cache   : Optional[np.ndarray] = None
-        self._skq_cache  : Optional[dict]       = None
-        self._skq_key    : str                  = "kurtosis"
-        self._pca_cache  : Optional[np.ndarray] = None
-        self._pca_S      : Optional[np.ndarray] = None
+        self._skf_cache  : Optional[dict]       = None
+        self._skf_key    : str                  = "kurtosis"
+        self._pct_cache  : Optional[np.ndarray] = None
+        self._pct_S      : Optional[np.ndarray] = None
         self._tsr_synth  : Optional[np.ndarray] = None
         self._haar_ca    : Optional[np.ndarray] = None
         self._haar_cd    : Optional[np.ndarray] = None
@@ -1542,8 +1541,8 @@ class IrView:
         c.chk_lock.toggled.connect(c.set_lock)
         c._proc_grp.buttonToggled.connect(
             lambda btn, on: (on and not self._loading) and self._on_proc_changed(btn))
-        c.cb_skq.currentIndexChanged.connect(
-            lambda _: self._skq_cache and self._refresh())
+        c.cb_skf.currentIndexChanged.connect(
+            lambda _: self._skf_cache and self._refresh())
         c.btn_setupct.toggled.connect(self._toggle_setupct)
         c.btn_set_roi.clicked.connect(self._start_roi)
         c.btn_reset_roi.clicked.connect(self._reset_roi)
@@ -1556,20 +1555,20 @@ class IrView:
     def _on_proc_changed(self, btn):
         c = self.ctrl
         multi = [c.btn_ftamp, c.btn_ftphase, c.btn_corr,
-                 c.btn_extrap, c.btn_ca, c.btn_dac, c.btn_rx, c.btn_skq,
-                 c.btn_pca_m, c.btn_tsr, c.btn_wavelet]
+                 c.btn_extrap, c.btn_ca, c.btn_dac, c.btn_rx, c.btn_skf,
+                 c.btn_pct_m, c.btn_tsr, c.btn_wavelet]
         if btn in multi and self.N <= 1:
             c.btn_temp.setChecked(True)
             QMessageBox.information(self.main_win, "Single frame",
                 "This mode requires more than one frame.")
             return
-        # SKQ sub-mode selector enabled only when SKQ active
-        c.cb_skq.setEnabled(btn is c.btn_skq)
+        # SKF sub-mode selector enabled only when SKF active
+        c.cb_skf.setEnabled(btn is c.btn_skf)
         # Clear relevant caches on mode switch
         self._corr_cache = None
         self._ca_cache   = self._dac_cache = None
-        self._rx_cache   = self._skq_cache = None
-        self._pca_cache  = self._pca_S    = None
+        self._rx_cache   = self._skf_cache = None
+        self._pct_cache  = self._pct_S    = None
         self._tsr_synth  = None
         self._haar_ca    = self._haar_cd  = None
         # CA/DAC need a cold frame — use frame 0 if not set
@@ -1580,7 +1579,7 @@ class IrView:
         c.btn_clamp_img.setChecked(True)
         c.set_manual_enabled(False)
         # Frame navigation irrelevant for static (single-image) results
-        static_modes = [c.btn_rx, c.btn_skq, c.btn_corr]
+        static_modes = [c.btn_rx, c.btn_skf, c.btn_corr]
         self.frame_panel.set_enabled(btn not in static_modes and self.N > 1)
         self._refresh()
 
@@ -1622,8 +1621,8 @@ class IrView:
         self._fft_cache  = self._fft_type = None
         self._corr_cache = None
         self._ca_cache   = self._dac_cache = None
-        self._rx_cache   = self._skq_cache = None
-        self._pca_cache  = self._pca_S    = None
+        self._rx_cache   = self._skf_cache = None
+        self._pct_cache  = self._pct_S    = None
         self._tsr_synth  = None
         self._haar_ca    = self._haar_cd  = None
         self._cold_frame = None
@@ -1724,7 +1723,7 @@ class IrView:
                       self.ctrl.btn_corr,
                       self.ctrl.btn_extrap, self.ctrl.btn_ca,
                       self.ctrl.btn_dac,   self.ctrl.btn_rx,
-                      self.ctrl.btn_skq,   self.ctrl.btn_pca_m,
+                      self.ctrl.btn_skf,   self.ctrl.btn_pct_m,
                       self.ctrl.btn_tsr,   self.ctrl.btn_wavelet]:
                 b.setEnabled(False)
         else:
@@ -1834,39 +1833,39 @@ class IrView:
                     self._sb.showMessage("")
             img = self._rx_cache.astype(float)
 
-        # ---- SKQ (kurtosis / skewness / RX / 5th moment) -------------------
-        elif c.btn_skq.isChecked():
-            if self._skq_cache is None:
-                self._sb.showMessage("Computing SKQ statistics...")
+        # ---- SKF (kurtosis / skewness / RX / 5th moment) -------------------
+        elif c.btn_skf.isChecked():
+            if self._skf_cache is None:
+                self._sb.showMessage("Computing SKF statistics...")
                 QApplication.processEvents()
                 try:
-                    self._skq_cache = skq_stats(self.seq)
+                    self._skf_cache = skf_stats(self.seq)
                 except Exception as ex:
-                    QMessageBox.warning(self.main_win, "SKQ error", str(ex))
+                    QMessageBox.warning(self.main_win, "SKF error", str(ex))
                     c.btn_temp.setChecked(True); return None
                 finally:
                     self._sb.showMessage("")
             key_map = {0: "kurtosis", 1: "skewness", 2: "rx", 3: "fifth"}
-            self._skq_key = key_map.get(c.cb_skq.currentIndex(), "kurtosis")
-            img = self._skq_cache[self._skq_key].astype(float)
+            self._skf_key = key_map.get(c.cb_skf.currentIndex(), "kurtosis")
+            img = self._skf_cache[self._skf_key].astype(float)
 
-        # ---- PCA M-Method ---------------------------------------------------
-        elif c.btn_pca_m.isChecked():
-            if self._pca_cache is None:
-                self._sb.showMessage("Computing PCA M-Method...")
+        # ---- PCT M-Method ---------------------------------------------------
+        elif c.btn_pct_m.isChecked():
+            if self._pct_cache is None:
+                self._sb.showMessage("Computing PCT M-Method...")
                 QApplication.processEvents()
                 try:
-                    self._pca_cache, self._pca_S, _ = pca_mmethod(self.seq)
+                    self._pct_cache, self._pct_S, _ = pct_mmethod(self.seq)
                 except Exception as ex:
-                    QMessageBox.warning(self.main_win, "PCA error", str(ex))
+                    QMessageBox.warning(self.main_win, "PCT error", str(ex))
                     c.btn_temp.setChecked(True); return None
                 finally:
                     self._sb.showMessage("")
-            nc  = self._pca_cache.shape[2]
+            nc  = self._pct_cache.shape[2]
             k   = min(idx, nc - 1)
-            img = self._pca_cache[:, :, k].astype(float)
-            wt  = 100 * self._pca_S[k] if k < len(self._pca_S) else 0
-            c.btn_pca_m.setText(f"PCA {wt:.1f}%")
+            img = self._pct_cache[:, :, k].astype(float)
+            wt  = 100 * self._pct_S[k] if k < len(self._pct_S) else 0
+            c.btn_pct_m.setText(f"PCT {wt:.1f}%")
 
         # ---- TSR (synthetic reconstruction) ---------------------------------
         elif c.btn_tsr.isChecked():
@@ -2184,7 +2183,7 @@ class IrView:
         mode = next((i for i, b in enumerate(
             [c.btn_temp, c.btn_ftamp, c.btn_ftphase, c.btn_extrap,
              c.btn_corr, c.btn_ca, c.btn_dac,
-             c.btn_rx, c.btn_skq, c.btn_pca_m, c.btn_tsr, c.btn_wavelet])
+             c.btn_rx, c.btn_skf, c.btn_pct_m, c.btn_tsr, c.btn_wavelet])
                      if b.isChecked()), 0)
         flt = 0 if c.btn_noflt.isChecked() else 1 if c.btn_gauss.isChecked() else 2
         return {"filter": flt, "variance": c.variance, "cmap": c.cb_cmap.currentIndex(),
@@ -2230,7 +2229,7 @@ class IrView:
             c.chk_grid.setChecked(state.get("grid", False))
             [c.btn_temp, c.btn_ftamp, c.btn_ftphase, c.btn_extrap,
              c.btn_corr, c.btn_ca, c.btn_dac,
-             c.btn_rx, c.btn_skq, c.btn_pca_m, c.btn_tsr,
+             c.btn_rx, c.btn_skf, c.btn_pct_m, c.btn_tsr,
              c.btn_wavelet][state.get("proc", 0)].setChecked(True)
             fp = self.frame_panel
             fp.sl_frame.setValue(int(np.clip(state.get("frame", 0), 0, self.N-1)) + 1)
