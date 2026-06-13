@@ -23,16 +23,16 @@ IR View supports two acquisition modes:
 
 Each incoming frame is decomposed into predefined regions corresponding to sensor layout (thermal image and metadata channels). These regions are exposed internally as structured arrays for downstream processing.  A processing pipeline operates on the incoming data stream, applying filtering and normalization stages before display. Common operations include temporal smoothing, spatial filtering, and algorithmic processing. IR View includes the following image-processing and thermographic analysis routines:
 
-- Fourier Amplitude: Computes the amplitude spectrum of each pixel's temporal response using the Fourier transform. Useful for frequency-domain analysis of thermal transients.
-- Fourier Phase: Computes the phase spectrum of each pixel's temporal response. Often less sensitive to non-uniform heating and surface emissivity variations than amplitude-based methods.
-- Absolute Contrast (AC): Enhances thermal anomalies by comparing each frame against a reference condition or baseline image.
-- Differential Absolute Contrast (DAC): Compensates for the theoretical thermal decay of a homogeneous material, improving defect visibility at later times.
-- Extrapolated Contrast _(work in progress)_: Estimates the expected thermal decay of a sound region and highlights deviations from that behaviour. Experimental implementation.
-- Correlation: Measures the similarity between each pixel's temporal evolution and a reference thermal response. Defective regions often exhibit reduced correlation.
-- Principal Component Thermography (PCT): Applies principal component analysis to the image sequence, concentrating relevant thermal information into a small number of orthogonal components.
-- Thermographic Signal Reconstruction (TSR): Fits a polynomial model to the logarithmic thermal decay curve, reducing noise and enabling derivative-based defect enhancement.
-- RX Detector: Statistical anomaly detector based on the Mahalanobis distance. Highlights pixels whose temporal behaviour differs significantly from the global background.
-- Skewness, Kurtosis and 5th Moment (SKF): Higher-order statistical descriptors of the temporal signal. Useful for identifying non-Gaussian thermal responses and localized anomalies.
+- **Fourier Amplitude**: Computes the amplitude spectrum of each pixel's temporal response using the Fourier transform. Useful for frequency-domain analysis of thermal transients.
+- **Fourier Phase**: Computes the phase spectrum of each pixel's temporal response. Often less sensitive to non-uniform heating and surface emissivity variations than amplitude-based methods.
+- **Absolute Contrast (AC)**: Enhances thermal anomalies by comparing each frame against a reference condition or baseline image.
+- **Differential Absolute Contrast (DAC)**: Compensates for the theoretical thermal decay of a homogeneous material, improving defect visibility at later times.
+- **Extrapolated Contrast _(EXPERIMENTAL)_**: Estimates the expected thermal decay of a sound region and highlights deviations from that behaviour. Experimental implementation.
+- **Correlation**: Measures the similarity between each pixel's temporal evolution and a reference thermal response. Defective regions often exhibit reduced correlation.
+- **Principal Component Thermography (PCT)**: Applies principal component analysis to the image sequence, concentrating relevant thermal information into a small number of orthogonal components.
+- **Thermographic Signal Reconstruction (TSR)**: Fits a polynomial model to the logarithmic thermal decay curve, reducing noise and enabling derivative-based defect enhancement.
+- **RX Detector**: Statistical anomaly detector based on the Mahalanobis distance. Highlights pixels whose temporal behaviour differs significantly from the global background.
+- **Skewness, Kurtosis and 5th Moment (SKF)**: Higher-order statistical descriptors of the temporal signal. Useful for identifying non-Gaussian thermal responses and localized anomalies.
 
 IR View acts as the central execution layer of the suite: all other utilities (ircap, irshot, irwebcam) either feed data into it or replicate subsets of its pipeline for debugging and acquisition tasks.
 
