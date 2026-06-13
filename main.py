@@ -1222,54 +1222,108 @@ class ControlPanel(QWidget):
         root.addWidget(g4)
 
         # Processing
-        g5 = QGroupBox("Processing"); gl5 = QGridLayout(g5); gl5.setSpacing(7)
+        g5 = QGroupBox("Processing")
+        gl5 = QGridLayout(g5)
+        gl5.setSpacing(7)
+
         def _p(t):
-            b = QPushButton(t); b.setCheckable(True); return b
+            b = QPushButton(t)
+            b.setCheckable(True)
+            return b
 
         self.btn_temp    = _p("Temperature ºC"); self.btn_temp.setChecked(True)
+
         self.btn_ftamp   = _p("FT Amplitude")
         self.btn_ftphase = _p("FT Phase")
+
         self.btn_ca      = _p("Abs. Contrast")
         self.btn_dac     = _p("Diff. AC")
+
+        self.btn_corr    = _p("Correlation")
+
         self.btn_extrap  = _p("Extrap. CT")
         self.btn_setupct = _p("Setup CT")
+
+        self.btn_wavelet = _p("Wavelet")
         self.btn_pct_m   = _p("PCT")
         self.btn_tsr     = _p("TSR")
-        self.btn_corr    = _p("Correlation")
+
         self.btn_rx      = _p("RX Detector")
+
         self.btn_skf     = _p("SKF")
-        self.btn_wavelet = _p("Wavelet")
 
-        self._proc_grp = QButtonGroup(); self._proc_grp.setExclusive(True)
-        for b in [self.btn_temp, self.btn_ftamp, self.btn_ftphase,
-                  self.btn_extrap, self.btn_corr,
-                  self.btn_ca, self.btn_dac, self.btn_rx, self.btn_skf,
-                  self.btn_pct_m, self.btn_tsr, self.btn_wavelet]:
-            self._proc_grp.addButton(b)
+        self._proc_grp = QButtonGroup()
+        self._proc_grp.setExclusive(True)
 
-        # SKF sub-mode selector (shown only when SKF active)
+        for b in [
+            self.btn_temp,
+            self.btn_ftamp, self.btn_ftphase,
+            self.btn_ca, self.btn_dac,
+            self.btn_corr,
+            self.btn_extrap, self.btn_setupct,
+            self.btn_wavelet, self.btn_pct_m, self.btn_tsr,
+            self.btn_rx, self.btn_skf
+        ]: self._proc_grp.addButton(b)
+
         self.cb_skf = QComboBox()
         self.cb_skf.addItems(["Kurtosis", "Skewness", "5th Moment"])
         self.cb_skf.setEnabled(False)
 
         r = 0
-        gl5.addWidget(self.btn_temp,    r, 0, 1, 2); r += 1
-        gl5.addWidget(self.btn_ftamp,   r, 0); gl5.addWidget(self.btn_ftphase, r, 1); r += 1
-        gl5.addWidget(self.btn_extrap,  r, 0, 1, 2); r += 1
-        gl5.addWidget(self.btn_corr,    r, 0); gl5.addWidget(self.btn_setupct,  r, 1); r += 1
-        gl5.addWidget(self.btn_ca,      r, 0); gl5.addWidget(self.btn_dac,     r, 1); r += 1
-        gl5.addWidget(self.btn_rx,      r, 0); gl5.addWidget(self.btn_skf,     r, 1); r += 1
-        gl5.addWidget(self.cb_skf,      r, 0, 1, 2); r += 1
-        gl5.addWidget(self.btn_pct_m,   r, 0); gl5.addWidget(self.btn_tsr,     r, 1); r += 1
-        gl5.addWidget(self.btn_wavelet, r, 0, 1, 2); r += 1
 
-        sep = QFrame(); sep.setFrameShape(QFrame.HLine); gl5.addWidget(sep, r, 0, 1, 2); r += 1
+        # Temperature
+        gl5.addWidget(self.btn_temp, r, 0, 1, 2)
+        r += 1
+
+        # Fourier
+        gl5.addWidget(self.btn_ftamp,   r, 0)
+        gl5.addWidget(self.btn_ftphase, r, 1)
+        r += 1
+
+        # Contrast
+        gl5.addWidget(self.btn_ca,  r, 0)
+        gl5.addWidget(self.btn_dac, r, 1)
+        r += 1
+
+        # Correlation
+        gl5.addWidget(self.btn_corr, r, 0, 1, 2)
+        r += 1
+
+        # Extrapolated Contrast
+        gl5.addWidget(self.btn_extrap,  r, 0)
+        gl5.addWidget(self.btn_setupct, r, 1)
+        r += 1
+
+        # SKF
+        gl5.addWidget(self.btn_skf, r, 0)
+        gl5.addWidget(self.cb_skf,  r, 1)
+        r += 1
+
+        # Decomposition
+        gl5.addWidget(self.btn_pct_m, r, 0)
+        gl5.addWidget(self.btn_tsr,   r, 1)
+        r += 1
+
+        # Wavelet + RX
+        gl5.addWidget(self.btn_wavelet, r, 0)
+        gl5.addWidget(self.btn_rx,      r, 1)
+        r += 1
+
+        # Separator
+        sep = QFrame()
+        sep.setFrameShape(QFrame.HLine)
+        gl5.addWidget(sep, r, 0, 1, 2)
+        r += 1
+
+        # ROI
         self.btn_set_roi   = QPushButton("Set ROI")
         self.btn_reset_roi = QPushButton("Reset ROI")
+
         gl5.addWidget(self.btn_set_roi,   r, 0)
         gl5.addWidget(self.btn_reset_roi, r, 1)
-        root.addWidget(g5)
+        r += 1
 
+        root.addWidget(g5)
         self._data_groups = [g3, g4, g5]
         root.addStretch(1)
 
