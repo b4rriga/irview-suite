@@ -388,7 +388,7 @@ void rx(const float *seq_centred, const float *sphere, float *out, int HW, int N
 	}
 }
 
-void skq(const float *seq_centred, float *kurt, float *skew, float *fifth, int HW, int N)
+void skf(const float *seq_centred, float *kurt, float *skew, float *fifth, int HW, int N)
 {
 	for (int p = 0; p < HW; p++) {
 
